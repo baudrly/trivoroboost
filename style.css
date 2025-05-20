@@ -215,6 +215,29 @@ body {
     font-size: 1.2em;
 }
 
+/* ... (previous CSS) ... */
+
+.data-source-group {
+    /* Initially hidden, shown by JS */
+}
+
+.input-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 25px 0;
+}
+
+#panel-input h3 { /* For "Common Input Settings" */
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    color: var(--text-muted);
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+/* ... (rest of CSS as before) ... */
+
 .canvas-wrapper {
     display: flex;
     justify-content: center;

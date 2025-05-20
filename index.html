@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hi-C Voronoi Binning Explorer</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,35 +27,85 @@
         <main id="main-content">
             <div class="panel active-panel" id="panel-input">
                 <h2><span class="icon">📄</span>Input Data</h2>
+
                 <div class="form-group">
-                    <label for="matrixAFile">Matrix A (CSV):</label>
-                    <input type="file" id="matrixAFile" accept=".csv">
+                    <label for="dataSourceA">Matrix A Source:</label>
+                    <select id="dataSourceA">
+                        <option value="file">File Upload</option>
+                        <option value="url">From URL</option>
+                        <option value="demo">Demo File</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="matrixBFile">Matrix B (CSV): (Optional for single matrix view)</label>
-                    <input type="file" id="matrixBFile" accept=".csv">
+                <div id="matrixAFileUploadGroup" class="form-group data-source-group">
+                    <label for="matrixAFile">Matrix A (CSV/CSV.GZ):</label>
+                    <input type="file" id="matrixAFile" accept=".csv,.csv.gz,.gz">
                 </div>
+                <div id="matrixAUrlGroup" class="form-group data-source-group" style="display:none;">
+                    <label for="matrixAUrl">Matrix A URL (CSV/CSV.GZ):</label>
+                    <input type="url" id="matrixAUrl" placeholder="https://example.com/matrixA.csv.gz">
+                </div>
+                <div id="matrixADemoGroup" class="form-group data-source-group" style="display:none;">
+                    <label for="matrixADemo">Select Demo Matrix A:</label>
+                    <select id="matrixADemo"></select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="matrixAIsGzipped">
+                    <label for="matrixAIsGzipped">Matrix A is Gzipped (auto-detect for .gz files)</label>
+                </div>
+
+                <hr class="input-divider">
+
                 <div class="form-group">
-                    <label for="format">Input Format:</label>
+                    <label for="dataSourceB">Matrix B Source: (Optional)</label>
+                    <select id="dataSourceB">
+                        <option value="file">File Upload</option>
+                        <option value="url">From URL</option>
+                        <option value="demo">Demo File</option>
+                        <option value="none" selected>None (Single Matrix Mode)</option>
+                    </select>
+                </div>
+                <div id="matrixBFileUploadGroup" class="form-group data-source-group">
+                    <label for="matrixBFile">Matrix B (CSV/CSV.GZ):</label>
+                    <input type="file" id="matrixBFile" accept=".csv,.csv.gz,.gz">
+                </div>
+                <div id="matrixBUrlGroup" class="form-group data-source-group" style="display:none;">
+                    <label for="matrixBUrl">Matrix B URL (CSV/CSV.GZ):</label>
+                    <input type="url" id="matrixBUrl" placeholder="https://example.com/matrixB.csv">
+                </div>
+                <div id="matrixBDemoGroup" class="form-group data-source-group" style="display:none;">
+                    <label for="matrixBDemo">Select Demo Matrix B:</label>
+                    <select id="matrixBDemo"></select>
+                </div>
+                 <div class="form-group checkbox-group">
+                    <input type="checkbox" id="matrixBIsGzipped">
+                    <label for="matrixBIsGzipped">Matrix B is Gzipped (auto-detect for .gz files)</label>
+                </div>
+
+
+                <hr class="input-divider">
+                <h3>Common Input Settings</h3>
+                <div class="form-group">
+                    <label for="format">Input Format (for selected source type):</label>
                     <select id="format">
                         <option value="sparse_individual">Sparse Individual (row, col, val)</option>
                         <option value="sparse_list_ab">Sparse List (row, col, valA, valB)</option>
                         <option value="dense">Dense Matrix (experimental)</option>
                     </select>
-                    <small>For "Sparse Individual", upload Matrix A and optionally B. For "Sparse List AB", only Matrix A input is used.</small>
+                    <small>Applies to how the content of chosen files/URLs is interpreted.</small>
                 </div>
                 <div class="form-group">
                     <label for="matrixDim">Matrix Dimension (N):</label>
                     <input type="number" id="matrixDim" value="200" min="10">
-                    <small>Max row/col index + 1. Auto-detected for sparse if possible, otherwise used for canvas scaling if files are not yet loaded.</small>
+                    <small>Max row/col index + 1. Auto-detected for sparse if possible, otherwise used for canvas scaling.</small>
                 </div>
                 <div class="form-group checkbox-group">
                     <input type="checkbox" id="isTriangular">
                     <label for="isTriangular">Input is Upper/Lower Triangular</label>
-                    <small>Check if your sparse input only contains one half of a symmetric matrix. Data will be symmetrized.</small>
+                    <small>Symmetrizes data if only one half of a symmetric matrix is provided.</small>
                 </div>
             </div>
 
+            <!-- panel-processing, panel-visualization, panel-voroserp unchanged -->
             <div class="panel" id="panel-processing">
                 <h2><span class="icon">⚙️</span>Initial Processing Options</h2>
                 <div class="form-group">
@@ -77,7 +128,7 @@
                 <div class="form-group">
                     <label for="maxPoints">Max Points for Initial Delaunay/Voronoi:</label>
                     <input type="number" id="maxPoints" value="10000" min="100" step="100">
-                    <small>Performance limit. Highest sum points prioritized.</small>
+                    <small>Performance limit for initial viz. Highest sum points prioritized.</small>
                 </div>
             </div>
 
@@ -160,17 +211,15 @@
                  <div class="form-group checkbox-group">
                     <input type="checkbox" id="enableVoroserp">
                     <label for="enableVoroserp">Enable Voroserp Binning</label>
-                    <small>This performs iterative merging. Can be computationally intensive. Display options for "Voroserp A/B/LogRatio" depend on this.</small>
+                    <small>This performs iterative merging. Can be computationally intensive.</small>
                 </div>
                 <div class="form-group">
-                    <label for="voroserpThresholdA">Voroserp Merge Threshold (Matrix A):</label>
+                    <label for="voroserpThresholdA">Voroserp Merge Threshold (Matrix A data):</label>
                     <input type="number" id="voroserpThresholdA" value="20" min="1">
-                    <small>Points with valA below this are candidates for merging (if Voroserp A enabled).</small>
                 </div>
                 <div class="form-group">
-                    <label for="voroserpThresholdB">Voroserp Merge Threshold (Matrix B):</label>
+                    <label for="voroserpThresholdB">Voroserp Merge Threshold (Matrix B data):</label>
                     <input type="number" id="voroserpThresholdB" value="20" min="1">
-                    <small>Points with valB below this are candidates for merging (if Voroserp B enabled and Matrix B loaded).</small>
                 </div>
                 <div class="form-group">
                     <label for="voroserpMaxIter">Voroserp Max Iterations:</label>
@@ -179,7 +228,7 @@
                  <div class="form-group checkbox-group">
                     <label for="runInWorker">Run Voroserp in Web Worker:</label>
                     <input type="checkbox" id="runInWorker" checked>
-                    <small>Recommended for smoother UI during intensive processing.</small>
+                    <small>Recommended for smoother UI.</small>
                 </div>
                 <div id="voroserpProgressA" class="progress-bar-container" style="display:none;">
                     <div class="progress-bar-label">Voroserp A: <span id="voroserpIterCountA">0</span> iter (<span id="voroserpMergedCountA">0</span> merged)</div>
@@ -191,6 +240,7 @@
                 </div>
             </div>
 
+
             <div id="visualization-output-area">
                 <!-- Canvases will be dynamically added here -->
             </div>
@@ -199,6 +249,7 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script> <!-- Pako for Gzip -->
     <script src="utils.js"></script>
     <script src="parser.js"></script>
     <script src="dataProcessor.js"></script>
