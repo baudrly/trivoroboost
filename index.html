@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hi-C Voronoi Binning Explorer</title>
+    <title>Voronoi Hi-C Binning</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
@@ -12,7 +12,7 @@
     <div id="app-container">
         <aside id="sidebar">
             <div class="logo">
-                <h1>Hi-C Explorer</h1>
+                <h1>Trivoroboost</h1>
             </div>
             <nav>
                 <button class="nav-btn active" data-panel="panel-input">Input Data</button>
@@ -20,6 +20,7 @@
                 <button class="nav-btn" data-panel="panel-visualization">Visualization</button>
                 <button class="nav-btn" data-panel="panel-voroserp">Voroserp Binning</button>
             </nav>
+            <img src="favicon.ico" height="35%" width="100%" />
             <button id="processVisualizeButton" class="action-button">Process & Visualize</button>
             <div id="statusMessages" class="status-bar">Ready.</div>
         </aside>
@@ -87,9 +88,9 @@
                 <div class="form-group">
                     <label for="format">Input Format (for selected source type):</label>
                     <select id="format">
+                        <option value="dense">Dense Matrix</option>
                         <option value="sparse_individual">Sparse Individual (row, col, val)</option>
                         <option value="sparse_list_ab">Sparse List (row, col, valA, valB)</option>
-                        <option value="dense">Dense Matrix (experimental)</option>
                     </select>
                     <small>Applies to how the content of chosen files/URLs is interpreted.</small>
                 </div>
@@ -140,9 +141,9 @@
                         <input type="checkbox" id="displayInputA" checked><label for="displayInputA">Input A (Raw)</label>
                         <input type="checkbox" id="displayInputB" checked><label for="displayInputB">Input B (Raw)</label>
                         <input type="checkbox" id="displayNaiveLogRatio" checked><label for="displayNaiveLogRatio">Naive Log Ratio</label>
-                        <input type="checkbox" id="displayBinnedA" checked><label for="displayBinnedA">Voroserp A</label>
-                        <input type="checkbox" id="displayBinnedB" checked><label for="displayBinnedB">Voroserp B</label>
-                        <input type="checkbox" id="displayBinnedLogRatio" checked><label for="displayBinnedLogRatio">Voroserp Log Ratio</label>
+                        <input type="checkbox" id="displayBinnedA" checked><label for="displayBinnedA">Binned A</label>
+                        <input type="checkbox" id="displayBinnedB" checked><label for="displayBinnedB">Binned B</label>
+                        <input type="checkbox" id="displayBinnedLogRatio" checked><label for="displayBinnedLogRatio">Binned Log Ratio</label>
                     </div>
                 </div>
                 <div class="form-group">
@@ -207,35 +208,35 @@
             </div>
             
             <div class="panel" id="panel-voroserp">
-                <h2><span class="icon">🔬</span>Voroserp Iterative Binning</h2>
+                <h2><span class="icon">🔬</span>Voronoi Iterative Binning</h2>
                  <div class="form-group checkbox-group">
                     <input type="checkbox" id="enableVoroserp">
-                    <label for="enableVoroserp">Enable Voroserp Binning</label>
+                    <label for="enableVoroserp">Enable Voronoi Binning</label>
                     <small>This performs iterative merging. Can be computationally intensive.</small>
                 </div>
                 <div class="form-group">
-                    <label for="voroserpThresholdA">Voroserp Merge Threshold (Matrix A data):</label>
+                    <label for="voroserpThresholdA">Binning Merge Threshold (Matrix A data):</label>
                     <input type="number" id="voroserpThresholdA" value="20" min="1">
                 </div>
                 <div class="form-group">
-                    <label for="voroserpThresholdB">Voroserp Merge Threshold (Matrix B data):</label>
+                    <label for="voroserpThresholdB">Binning Merge Threshold (Matrix B data):</label>
                     <input type="number" id="voroserpThresholdB" value="20" min="1">
                 </div>
                 <div class="form-group">
-                    <label for="voroserpMaxIter">Voroserp Max Iterations:</label>
+                    <label for="voroserpMaxIter">Max Iterations:</label>
                     <input type="number" id="voroserpMaxIter" value="1000" min="10" step="100">
                 </div>
                  <div class="form-group checkbox-group">
-                    <label for="runInWorker">Run Voroserp in Web Worker:</label>
+                    <label for="runInWorker">Run Voronoi Binning in Web Worker:</label>
                     <input type="checkbox" id="runInWorker" checked>
                     <small>Recommended for smoother UI.</small>
                 </div>
                 <div id="voroserpProgressA" class="progress-bar-container" style="display:none;">
-                    <div class="progress-bar-label">Voroserp A: <span id="voroserpIterCountA">0</span> iter (<span id="voroserpMergedCountA">0</span> merged)</div>
+                    <div class="progress-bar-label">Binned A: <span id="voroserpIterCountA">0</span> iter (<span id="voroserpMergedCountA">0</span> merged)</div>
                     <div class="progress-bar"><div id="voroserpProgressBarFillA" style="width: 0%;"></div></div>
                 </div>
                  <div id="voroserpProgressB" class="progress-bar-container" style="display:none;">
-                    <div class="progress-bar-label">Voroserp B: <span id="voroserpIterCountB">0</span> iter (<span id="voroserpMergedCountB">0</span> merged)</div>
+                    <div class="progress-bar-label">Binned B: <span id="voroserpIterCountB">0</span> iter (<span id="voroserpMergedCountB">0</span> merged)</div>
                     <div class="progress-bar"><div id="voroserpProgressBarFillB" style="width: 0%;"></div></div>
                 </div>
             </div>
